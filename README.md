@@ -1,6 +1,6 @@
-# Datadog GCP Logs Proxy
+# Datadog GCP Logs Forwarding
 
-A workaround to enable Datadog log collection for organizations using GCP w/ VPC service controls
+Enable Datadog log collection for organizations using GCP w/ VPC service controls
 
 ---
 
@@ -11,8 +11,7 @@ does not currently work for organizations that
 have [VPC service controls](https://cloud.google.com/vpc-service-controls) enabled due to
 a [documented limitation of Pub/Sub push subscriptions](https://cloud.google.com/pubsub/docs/push#vpc-service-control).
 
-This repo is a Terraform module to create a few resources in GCP that should work around the problem described
-above. The GCP resources created are
+This repo is a Terraform module to create a few resources in Google Cloud. Those resources are:
 
 - a Cloud Run service to run [Envoy](https://www.envoyproxy.io/) as a reverse HTTP proxy
     - Uses the [official docker image](https://hub.docker.com/r/envoyproxy/envoy)
@@ -20,13 +19,12 @@ above. The GCP resources created are
 - a Pub/Sub Topic to collect logs via a [log sink](https://cloud.google.com/logging/docs/routing/overview#sinks)
 - a Pub/Sub Subscription to push logs to the Envoy proxy
 
-### How does is work?
+### How does it work?
 
-This is really nothing special, just a reverse HTTP proxy to get around a GCP limitation. The flow is:
+It's a reverse HTTP proxy to get around the GCP limitation. The flow is:
+- Google Pub/Sub subcription sends logs to the Proxy (running as a Cloud Run service)
+- The proxy compresses and sends the log to Datadog API
 
-```Pub/Sub subscription <-> Cloud Run Envoy Proxy <-> Datadog Logs API```
-
-The only additional functionality enabled by this workaround is GZIP compression btw the proxy and Datadog.
 
 ### How do I use this?
 
